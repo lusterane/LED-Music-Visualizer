@@ -154,7 +154,7 @@ class Stream_Reader:
         for mic in mics:
             self.print_mic_info(mic)
 
-        return mics[0]
+        return mics[2]
 
     def print_mic_info(self, mic):
         mic_info = self.pa.get_device_info_by_index(mic)

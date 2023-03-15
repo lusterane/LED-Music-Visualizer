@@ -43,7 +43,6 @@ def run_FFT_analyzer():
                     height    = args.height,     # Height, in pixels, of the visualizer window,
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
                     )
-
     fps = 60  #How often to update the FFT features + display
     last_update = time.time()
     while True:
