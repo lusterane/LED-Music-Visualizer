@@ -1,5 +1,7 @@
 import argparse
 from src.stream_analyzer import Stream_Analyzer
+from src.color_mapper import Color_Mapper
+from src.serial_data_manager import Serial_Data_Manager
 import time
 
 def parse_args():
@@ -43,14 +45,62 @@ def run_FFT_analyzer():
                     height    = args.height,     # Height, in pixels, of the visualizer window,
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
                     )
+    color_mapper = Color_Mapper()
+    serial_manager = Serial_Data_Manager()
     fps = 60  #How often to update the FFT features + display
     last_update = time.time()
     while True:
         if (time.time() - last_update) > (1./fps):
             last_update = time.time()
             raw_fftx, raw_fft, binned_fftx, binned_fft = ear.get_audio_features()
+
+            # process rgb value
+            if color_mapper.update_frequencies(ear.frequency_bin_energies):
+                power = color_mapper.calculate_power()
+                # convert power to whole number
+                power *= 100
+                power = int(power)
+                # scale to 255
+                power = 255*power // 100
+                if power >= 251:
+                    power = 250
+                print_power(power)
+                serial_manager.write(power)
+
         elif args.sleep_between_frames:
             time.sleep(((1./fps)-(time.time()-last_update)) * 0.99)
 
+def print_power(power):
+    # convert to 100 scale
+    power = (power / 255) * 100
+    for _ in range(int(power)):
+        print('.',end='')
+    for _ in range(100-int(power)):
+        print(' ',end='')
+    print('|')
+
+def test_arduino():
+    # serial_manager = Serial_Data_Manager()
+    # res = serial_manager.write_test()
+    import serial
+    s = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
+    time.sleep(2)
+    while True:
+        s.write('0\n'.encode())
+        print("giving 0")
+        time.sleep(1)
+
+
+        s.write('58\n'.encode())
+        print('giving 58')
+        time.sleep(1)
+
+
+    # while True:
+    # time.sleep(2)
+    # print(s.readline())
+
+
 if __name__ == '__main__':
     run_FFT_analyzer()
+    # test_arduino()
