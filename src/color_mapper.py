@@ -23,18 +23,6 @@ class Color_Mapper:
             self.power_mean_q.pop(0)
         self.power_mean_q.append(self.__calculate_current_power())
 
-    def __get_frequency_greatest_change(self): # return frequency
-        greatest_change_freq = 0
-        max_change = 0
-        for i in range(4):
-            x,y = self.freq_section_means[i], self.prev_freq_section_means[i]
-            curr_change = (x - y)/max(x,y)
-            if curr_change > max_change:
-                max_change = curr_change
-                greatest_change_freq = i
-        self.__setup_for_next_update()
-        return greatest_change_freq
-
     def __update_max_power(self):
         self.MAX_POWER = max(self.frequencies_for_power)//5
     def __calculate_current_power(self):
@@ -44,7 +32,6 @@ class Color_Mapper:
         if power > 1.0:
             return 1.0
         return power
-
     def get_power(self):
         return self.__calculate_current_power()
 

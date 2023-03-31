@@ -64,11 +64,8 @@ def run_FFT_analyzer():
             # process rgb value
             if color_mapper.update_frequencies(ear.frequency_bin_energies):
                 power = convert_255_scale(color_mapper.get_power())
-                # rgb = color_mapper.get_curr_rgb()
                 ret_str = serial_manager.convert_rgb_power_to_string([255,0,255],power)
-                # ret_str = serial_manager.convert_power_to_string(power)
                 print_power(power)
-                # print(ret_str)
                 serial_manager.write(ret_str)
 
         elif args.sleep_between_frames:
