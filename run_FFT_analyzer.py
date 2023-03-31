@@ -46,17 +46,14 @@ def run_FFT_analyzer():
                     height    = args.height,     # Height, in pixels, of the visualizer window,
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
                     )
+
     color_mapper = Color_Mapper()
     serial_manager = Serial_Data_Manager()
+
     fps = 30  #How often to update the FFT features + display
     last_update = time.time()
 
     while True:
-        # if serial_manager.runtime % 2 == 0:
-        #     serial_manager.runtime = 1
-        #     # skip frame
-        #     continue
-        # serial_manager.runtime += 1
         if (time.time() - last_update) > (1./fps):
             last_update = time.time()
             raw_fftx, raw_fft, binned_fftx, binned_fft = ear.get_audio_features()
@@ -64,8 +61,13 @@ def run_FFT_analyzer():
             # process rgb value
             if color_mapper.update_frequencies(ear.frequency_bin_energies):
                 power = convert_255_scale(color_mapper.get_power())
-                ret_str = serial_manager.convert_rgb_power_to_string([255,0,255],power)
-                print_power(power)
+                # if power > 50:
+                color = color_mapper.get_color()
+                # else:
+                #     color = [0,0,0]
+                print(color)
+                ret_str = serial_manager.convert_rgb_power_to_string(color,power)
+                # print_power(power)
                 serial_manager.write(ret_str)
 
         elif args.sleep_between_frames:
