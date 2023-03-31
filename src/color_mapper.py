@@ -1,34 +1,52 @@
 from collections import deque
+from statistics import mean
 class Color_Mapper:
     def __init__(self):
         self.frequency_bin_energies = []
-        self.means_q = deque()
-        self.MEANS_Q_LEN = 5
+        self.frequencies_for_power = []
+
+        self.power_mean_q = []
+        self.POWER_MEAN_Q_LEN = 5
+        self.MAX_POWER = 150000
     def update_frequencies(self, frequency_bin_energies):
         if len(frequency_bin_energies) < 400:
             return False
-        self.frequency_bin_energies = frequency_bin_energies[:100]
+        self.frequency_bin_energies = frequency_bin_energies
+        self.frequencies_for_power = frequency_bin_energies[:150]
 
-
+        # processing
+        self.__update_power_mean_q()
+        # self.__update_max_power()
         return True
+    def __update_power_mean_q(self):
+        if len(self.power_mean_q) == self.POWER_MEAN_Q_LEN:
+            self.power_mean_q.pop(0)
+        self.power_mean_q.append(self.__calculate_current_power())
 
-    def __update_means_q(self):
-        if len(self.means_q) == self.MEANS_Q_LEN:
-            self.means_q.popleft()
-        self.means_q.append(self.__get_mean(self.frequency_bin_energies))
-    def __get_mean(self,arr):
-        return round((sum(arr)/len(arr)))
-    def calculate_power(self):
-        max_power = 80000
+    def __get_frequency_greatest_change(self): # return frequency
+        greatest_change_freq = 0
+        max_change = 0
+        for i in range(4):
+            x,y = self.freq_section_means[i], self.prev_freq_section_means[i]
+            curr_change = (x - y)/max(x,y)
+            if curr_change > max_change:
+                max_change = curr_change
+                greatest_change_freq = i
+        self.__setup_for_next_update()
+        return greatest_change_freq
+
+    def __update_max_power(self):
+        self.MAX_POWER = max(self.frequencies_for_power)//5
+    def __calculate_current_power(self):
         # if len(self.means_q) == self.MEANS_Q_LEN:
         #     max_power = max(self.means_q)
-        power = round((sum(self.frequency_bin_energies)/len(self.frequency_bin_energies))/max_power,2)
+        power = round(mean(self.frequencies_for_power)/self.MAX_POWER,2)
         if power > 1.0:
             return 1.0
         return power
 
-    def get_average(self):
-        return round((sum(self.frequency_bin_energies) / len(self.frequency_bin_energies)), 2)
+    def get_power(self):
+        return self.__calculate_current_power()
 
 
 
