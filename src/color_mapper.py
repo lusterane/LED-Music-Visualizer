@@ -4,7 +4,7 @@ from statistics import mean
 
 
 class Color_Mapper:
-    def __init__(self,cycle_through_themes=False):
+    def __init__(self, default_color_theme, cycle_through_themes=False):
         self.frequency_bin_energies = []
         self.frequencies_for_power = []
 
@@ -20,7 +20,7 @@ class Color_Mapper:
         self.frames = 0
         self.CYCLE = 300  # 30 frames = 1 second
 
-        self.current_theme = Color_Theme.LAVA.value
+        self.current_theme = default_color_theme
         self.cycle_through_themes = cycle_through_themes
 
     def update_frequencies(self, frequency_bin_energies):

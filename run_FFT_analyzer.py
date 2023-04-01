@@ -1,6 +1,7 @@
 import argparse
 from src.stream_analyzer import Stream_Analyzer
 from src.color_mapper import Color_Mapper
+from src.color_mapper import Color_Theme
 from src.serial_data_manager import Serial_Data_Manager
 import time
 from enum import Enum
@@ -47,7 +48,7 @@ def run_FFT_analyzer():
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
                     )
 
-    color_mapper = Color_Mapper()
+    color_mapper = Color_Mapper(Color_Theme.MOUNTAIN_DEW.value)
     serial_manager = Serial_Data_Manager()
 
     fps = 30  #How often to update the FFT features + display
