@@ -1,5 +1,6 @@
-from collections import deque
 from statistics import mean
+from enum import Enum
+import random
 class Color_Mapper:
     def __init__(self):
         self.frequency_bin_energies = []
@@ -11,6 +12,11 @@ class Color_Mapper:
 
         self.power_mean_q = []
         self.color_mean_q = []
+
+        self.frames = 0
+        self.CYCLE = 300 # 30 frames = 1 second
+
+        self.current_theme = Color_Theme.COTTON_CANDY.value
     def update_frequencies(self, frequency_bin_energies):
         if len(frequency_bin_energies) < 400:
             return False
@@ -18,10 +24,18 @@ class Color_Mapper:
         self.frequencies_for_power = frequency_bin_energies[:150] # bass level
         # self.__update_MAX_FREQ_POWER()
 
-        # processing
+        self.__update_properties()
+        return True
+
+    def __update_properties(self):
         self.__update_power_mean_q()
         self.__update_color_mean_q()
-        return True
+
+        self.__update_frame()
+    def __update_frame(self):
+        if self.frames > self.CYCLE:
+            self.frames = 0
+        self.frames += 1
 
     def __update_color_mean_q(self):
         if len(self.color_mean_q) == self.MEAN_Q_LEN:
@@ -67,23 +81,30 @@ class Color_Mapper:
 
     def get_color(self):
         dominant_section = self.__get_greatest_color_change()
-        if dominant_section == 0:
-            # pink
-            return [255,20,120]
-        elif dominant_section == 1:
-            # blue
-            return [50, 83, 200]
-        elif dominant_section == 2:
-            # light blue
-            return [250,50,83]
-        else:
-            # purple
-            return [150,50,250]
+        if self.frames == self.CYCLE:
+            themes = [Color_Theme.COTTON_CANDY,
+                      Color_Theme.LAVA,
+                      Color_Theme.MOUNTAIN_DEW]
+            temp_theme = themes[random.randint(0,len(themes)-1)].value
+            while self.current_theme == temp_theme:
+                temp_theme = themes[random.randint(0,len(themes)-1)].value
+            self.current_theme = temp_theme
+        return self.current_theme[dominant_section]
 
-        # if dominant_section == 0 or dominant_section == 1:
-        #     return [250,0,0]
-        # else:
-        #     return [0,0,0]
+class Color_Theme(Enum):
+    COTTON_CANDY = [[255,20,120],
+                    [52, 50, 200],
+                    [250,50,83],
+                    [150,50,250]]
+    LAVA = [[255,0,0],
+            [255, 10, 0],
+            [255, 20, 0],
+            [255, 30, 0]]
+    MOUNTAIN_DEW = [[100, 255, 0], # green
+                    [106, 180, 10], # light green
+                    [106, 106, 0],
+                    [104, 104, 30]]
+
 
 
 
