@@ -4,7 +4,7 @@ from statistics import mean
 
 
 class Color_Mapper:
-    def __init__(self):
+    def __init__(self,cycle_through_themes=False):
         self.frequency_bin_energies = []
         self.frequencies_for_power = []
 
@@ -15,10 +15,13 @@ class Color_Mapper:
         self.power_mean_q = []
         self.color_mean_q = []
 
+
+        # color theming
         self.frames = 0
         self.CYCLE = 300  # 30 frames = 1 second
 
-        self.current_theme = Color_Theme.COTTON_CANDY.value
+        self.current_theme = Color_Theme.LAVA.value
+        self.cycle_through_themes = cycle_through_themes
 
     def update_frequencies(self, frequency_bin_energies):
         if len(frequency_bin_energies) < 400:
@@ -88,7 +91,7 @@ class Color_Mapper:
 
     def get_color(self):
         dominant_section = self.__get_greatest_color_change()
-        if self.frames == self.CYCLE:
+        if self.frames == self.CYCLE and self.cycle_through_themes:
             themes = [Color_Theme.COTTON_CANDY,
                       Color_Theme.LAVA,
                       Color_Theme.MOUNTAIN_DEW]
