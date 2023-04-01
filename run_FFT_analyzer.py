@@ -1,6 +1,9 @@
 import argparse
 from src.stream_analyzer import Stream_Analyzer
+from src.color_mapper import Color_Mapper
+from src.serial_data_manager import Serial_Data_Manager
 import time
+import random
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -43,14 +46,67 @@ def run_FFT_analyzer():
                     height    = args.height,     # Height, in pixels, of the visualizer window,
                     window_ratio = window_ratio  # Float ratio of the visualizer window. e.g. 24/9
                     )
-    fps = 60  #How often to update the FFT features + display
+
+    color_mapper = Color_Mapper()
+    serial_manager = Serial_Data_Manager()
+
+    fps = 30  #How often to update the FFT features + display
     last_update = time.time()
+
     while True:
         if (time.time() - last_update) > (1./fps):
             last_update = time.time()
             raw_fftx, raw_fft, binned_fftx, binned_fft = ear.get_audio_features()
+
+            # process rgb value
+            if color_mapper.update_frequencies(ear.frequency_bin_energies):
+                power = convert_255_scale(color_mapper.get_power())
+                color = color_mapper.get_color()
+                ret_str = serial_manager.convert_rgb_power_to_string(color, power)
+                # print_power(power)
+                serial_manager.write(ret_str)
+
         elif args.sleep_between_frames:
             time.sleep(((1./fps)-(time.time()-last_update)) * 0.99)
+def convert_255_scale(power):
+    power *= 100
+    power = int(power)
+    # scale to 255
+    power = 255 * power // 100
+    if power >= 251:
+        power = 250
+    return power
+def print_power(power):
+    # convert to 100 scale
+    power = (power / 255) * 100
+    for _ in range(int(power)):
+        print('.',end='')
+    for _ in range(100-int(power)):
+        print(' ',end='')
+    print('|')
+
+def test_arduino():
+    # serial_manager = Serial_Data_Manager()
+    # res = serial_manager.write_test()
+    import serial
+    s = serial.Serial(port='COM3', baudrate=115200, timeout=.1)
+    time.sleep(2)
+    while True:
+        s.write('0\n'.encode())
+        print("giving 0")
+        time.sleep(1)
+
+
+        s.write('58\n'.encode())
+        print('giving 58')
+        time.sleep(1)
+
+
+    # while True:
+    # time.sleep(2)
+    # print(s.readline())
+
 
 if __name__ == '__main__':
     run_FFT_analyzer()
+    # test_arduino()
