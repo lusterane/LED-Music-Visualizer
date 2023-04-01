@@ -30,19 +30,19 @@ class Serial_Data_Manager():
     def read_test(self):
         return self.arduino.readline()
 
-    def convert_rgb_power_to_string(self, rgb, power):
+    def create_data_string(self, lighting_preset, rgb, power):
         r, g, b = rgb
-        ret_str = ''
-        ret_str += self.__convert_int_to_string(r)
-        ret_str += self.__convert_int_to_string(g)
-        ret_str += self.__convert_int_to_string(b)
-        ret_str += self.__convert_int_to_string(power)
+        ret_str = lighting_preset
+        ret_str += self.__convert_int_to_255_string(r)
+        ret_str += self.__convert_int_to_255_string(g)
+        ret_str += self.__convert_int_to_255_string(b)
+        ret_str += self.__convert_int_to_255_string(power)
         return ret_str
 
     def convert_power_to_string(self, power):
-        return self.__convert_int_to_string(power)
+        return self.__convert_int_to_255_string(power)
 
-    def __convert_int_to_string(self, val):
+    def __convert_int_to_255_string(self, val):
         if val < 10:
             return '00' + str(val)
         elif val < 100:

@@ -3,7 +3,7 @@ from src.stream_analyzer import Stream_Analyzer
 from src.color_mapper import Color_Mapper
 from src.serial_data_manager import Serial_Data_Manager
 import time
-import random
+from enum import Enum
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -62,7 +62,7 @@ def run_FFT_analyzer():
             if color_mapper.update_frequencies(ear.frequency_bin_energies):
                 power = convert_255_scale(color_mapper.get_power())
                 color = color_mapper.get_color()
-                ret_str = serial_manager.convert_rgb_power_to_string(color, power)
+                ret_str = serial_manager.create_data_string(Lighting_Preset.MOVING_WAVES.value, color, power)
                 # print_power(power)
                 serial_manager.write(ret_str)
 
@@ -84,6 +84,12 @@ def print_power(power):
     for _ in range(100-int(power)):
         print(' ',end='')
     print('|')
+
+class Lighting_Preset(Enum):
+    MOVING_WAVES = "0"
+    ALL_LIGHTS = "1"
+    EXPAND_FROM_MIDDLE = "2"
+
 
 def test_arduino():
     # serial_manager = Serial_Data_Manager()
